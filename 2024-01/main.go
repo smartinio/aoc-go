@@ -49,7 +49,7 @@ func part2() {
 }
 
 func parseInput() ([]int, []int) {
-	file, _ := os.Open("2024-01.txt")
+	file, _ := os.Open("2024-01/input.txt")
 
 	defer file.Close()
 

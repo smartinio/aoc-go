@@ -1,0 +1,18 @@
+#!/bin/bash
+
+watch_directory="$1"
+main_file="$1/main.go"
+
+last_modified=0
+
+while true; do
+    new_modified=$(find "$watch_directory" -type f -exec stat -f "%m" {} + | sort -nr | head -n1)
+
+    if [ "$new_modified" -ne "$last_modified" ]; then
+        clear
+        last_modified=$new_modified
+        go run "$main_file"
+    fi
+
+    sleep 0.3
+done

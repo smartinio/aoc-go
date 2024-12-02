@@ -5,4 +5,7 @@
     "editor.formatOnSaveMode": "file",
     "editor.defaultFormatter": "golang.go"
   },
+  "supermaven.enable": {
+    "*": false
+  }
 }
