@@ -1,0 +1,8 @@
+d=$(date -j +%Y-%d)
+day=${1-$d}
+
+mkdir "$day"
+touch "./$day/example.txt"
+touch "./$day/input.txt"
+
+sed "s/\\\$DAY/$day/g" ./template.go > "./$day/main.go"
