@@ -1,7 +1,7 @@
 #!/bin/bash
 
 watch_directory="$1"
-main_file="$1/main.go"
+solution="$1/solution.go"
 
 last_modified=0
 
@@ -11,7 +11,7 @@ while true; do
     if [ "$new_modified" -ne "$last_modified" ]; then
         clear
         last_modified=$new_modified
-        go run "$main_file"
+        go run "$solution"
     fi
 
     sleep 0.3

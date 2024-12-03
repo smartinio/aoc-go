@@ -2,7 +2,7 @@
 
 ```shell
 # Normal mode
-go run 2024-01/main.go
+go run 2024-01/solution.go
 
 # Watch mode
 ./watch 2024-01

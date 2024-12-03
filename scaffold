@@ -5,4 +5,4 @@ mkdir "$day"
 touch "./$day/example.txt"
 touch "./$day/input.txt"
 
-sed "s/\\\$DAY/$day/g" ./template.go > "./$day/main.go"
+sed "s/\\\$DAY/$day/g" ./template.go > "./$day/solution.go"
