@@ -1,9 +1,17 @@
 # aoc-go
 
+Using aoc to learn golang
+
 ```shell
-# Normal mode
+# Scaffold next day
+./scaffold
+
+# Run solution
 go run 2024-01/solution.go
 
-# Watch mode
+# Watch solution (latest day)
+./watch
+
+# Watch solution (specific day)
 ./watch 2024-01
 ```
