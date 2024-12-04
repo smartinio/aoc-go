@@ -1,3 +1,5 @@
+#!/bin/bash
+
 d=$(date -j +%Y-%d)
 day=${1-$d}
 
