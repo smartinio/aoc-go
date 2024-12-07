@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Dir struct{ x, y int }
 type Pos struct{ x, y int }
 type PosDir struct{ x, y, dir int }
-
 type SafeCounter struct {
 	mu sync.Mutex
 	v  map[string]int
@@ -31,26 +31,45 @@ var dirs []Dir = []Dir{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 var dirlen int = len(dirs)
 
 func main() {
-	visited := make(map[Pos]int)
-	sx, sy := findStart()
-	x, y := sx, sy
-	dir := 0
-	c := SafeCounter{v: make(map[string]int)}
+	part1, part2 := 0, 0
+	sum := 0
+	n := 1 // increase samples if benching perf
 
-	for x >= 0 && y >= 0 && x < w && y < h {
-		key := Pos{x, y}
-		_, didVisit := visited[key]
+	for range n {
+		start := time.Now()
+		part1, part2 = solution()
+		sum += int(time.Since(start).Milliseconds())
+	}
+
+	fmt.Println("part1:", part1)
+	fmt.Println("part2:", part2)
+	fmt.Println("avg:", sum/n, "ms")
+}
+
+func solution() (int, int) {
+	visited := make(map[Pos]int)
+	start := findStart()
+	curr := start
+	dir := 0
+
+outer:
+	for {
+		_, didVisit := visited[curr]
 
 		if !didVisit {
-			visited[key] = dir
+			visited[curr] = dir
 		}
 
 		for {
-			nx, ny := getNext(x, y, dir)
-			next := charAt(nx, ny)
+			next := getNext(curr, dir)
+			nextChar := charAt(next)
 
-			if next != '#' {
-				x, y = nx, ny
+			if nextChar == 0 {
+				break outer
+			}
+
+			if nextChar != '#' {
+				curr = next
 				break
 			}
 
@@ -58,68 +77,67 @@ func main() {
 		}
 	}
 
+	part2 := SafeCounter{v: make(map[string]int)}
 	var wg sync.WaitGroup
 
 	for k, dir := range visited {
-		if k == (Pos{sx, sy}) {
+		if k == start {
 			continue
 		}
 
 		wg.Add(1)
-
 		go func(k Pos, dir int) {
 			defer wg.Done()
 
-			visitedDir := make(map[PosDir]bool)
-
-			bx := k.x
-			by := k.y
-
+			visitedPosDirs := make(map[PosDir]bool)
+			block := Pos{k.x, k.y}
 			d := dirs[dir]
-			x, y := bx-d.x, by-d.y
+			curr := Pos{block.x - d.x, block.y - d.y}
 
-			sum := 0
+		outer:
+			for {
+				dk := PosDir{curr.x, curr.y, dir}
 
-			for x >= 0 && y >= 0 && x < w && y < h {
-				dk := PosDir{x, y, dir}
-
-				if visitedDir[dk] {
-					sum++
+				if visitedPosDirs[dk] {
+					part2.Inc("loops", 1)
 					break
 				}
 
-				visitedDir[dk] = true
+				visitedPosDirs[dk] = true
 
 				for {
-					nx, ny := getNext(x, y, dir)
-					next := charAt(nx, ny)
+					next := getNext(curr, dir)
+					nextChar := charAt(next)
 
-					if next != '#' && !(nx == bx && ny == by) {
-						x, y = nx, ny
+					if nextChar == 0 {
+						break outer
+					}
+
+					if next != block && nextChar != '#' {
+						curr = next
 						break
 					}
 
 					dir = (dir + 1) % dirlen
 				}
 			}
-
-			c.Inc("loops", sum)
 		}(k, dir)
 	}
 
 	wg.Wait()
 
-	fmt.Println("part1:", len(visited))
-	fmt.Println("part2:", c.v["loops"])
+	return len(visited), part2.v["loops"]
 }
 
-func getNext(x int, y int, dir int) (int, int) {
+func getNext(pos Pos, dir int) Pos {
 	d := dirs[dir]
-	nx, ny := x+d.x, y+d.y
-	return nx, ny
+
+	return Pos{pos.x + d.x, pos.y + d.y}
 }
 
-func charAt(x int, y int) rune {
+func charAt(pos Pos) rune {
+	x, y := pos.x, pos.y
+
 	if x >= w || y >= h || x < 0 || y < 0 {
 		return 0
 	}
@@ -127,14 +145,13 @@ func charAt(x int, y int) rune {
 	return rune(input[int(y)*int(w+1)+int(x)])
 }
 
-func findStart() (int, int) {
+func findStart() Pos {
 	for x := range w {
 		for y := range h {
-			if charAt(x, y) == '^' {
-				return x, y
+			if charAt(Pos{x, y}) == '^' {
+				return Pos{x, y}
 			}
 		}
 	}
-
-	return 0, 0
+	return Pos{}
 }
