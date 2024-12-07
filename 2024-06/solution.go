@@ -3,11 +3,25 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"strconv"
 	"strings"
+	"sync"
 )
 
 type Dir struct{ x, y int }
+type Pos struct{ x, y int }
+type PosDir struct{ x, y, dir int }
+
+type SafeCounter struct {
+	mu sync.Mutex
+	v  map[string]int
+}
+
+func (c *SafeCounter) Inc(key string, value int) {
+	c.mu.Lock()
+	// Lock so only one goroutine at a time can access the map c.v.
+	c.v[key] += value
+	c.mu.Unlock()
+}
 
 //go:embed input.txt
 var input string
@@ -17,18 +31,18 @@ var dirs []Dir = []Dir{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 var dirlen int = len(dirs)
 
 func main() {
-	visited := make(map[string]int)
+	visited := make(map[Pos]int)
 	sx, sy := findStart()
 	x, y := sx, sy
 	dir := 0
-	loops := 0
+	c := SafeCounter{v: make(map[string]int)}
 
 	for x >= 0 && y >= 0 && x < w && y < h {
-		k := key(x, y)
-		_, didVisit := visited[k]
+		key := Pos{x, y}
+		_, didVisit := visited[key]
 
 		if !didVisit {
-			visited[k] = dir
+			visited[key] = dir
 		}
 
 		for {
@@ -44,45 +58,59 @@ func main() {
 		}
 	}
 
+	var wg sync.WaitGroup
+
 	for k, dir := range visited {
-		if k == key(sx, sy) {
+		if k == (Pos{sx, sy}) {
 			continue
 		}
 
-		visitedDir := make(map[string]bool)
-		kx := strings.Split(k, ":")
-		bx, _ := strconv.Atoi(kx[0])
-		by, _ := strconv.Atoi(kx[1])
+		wg.Add(1)
 
-		d := dirs[dir]
-		x, y = bx-d.x, by-d.y
+		go func(k Pos, dir int) {
+			defer wg.Done()
 
-		for x >= 0 && y >= 0 && x < w && y < h {
-			dk := dirKey(x, y, dir)
+			visitedDir := make(map[PosDir]bool)
 
-			if visitedDir[dk] {
-				loops++
-				break
-			}
+			bx := k.x
+			by := k.y
 
-			visitedDir[dk] = true
+			d := dirs[dir]
+			x, y := bx-d.x, by-d.y
 
-			for {
-				nx, ny := getNext(x, y, dir)
-				next := charAt(nx, ny)
+			sum := 0
 
-				if next != '#' && !(nx == bx && ny == by) {
-					x, y = nx, ny
+			for x >= 0 && y >= 0 && x < w && y < h {
+				dk := PosDir{x, y, dir}
+
+				if visitedDir[dk] {
+					sum++
 					break
 				}
 
-				dir = (dir + 1) % dirlen
+				visitedDir[dk] = true
+
+				for {
+					nx, ny := getNext(x, y, dir)
+					next := charAt(nx, ny)
+
+					if next != '#' && !(nx == bx && ny == by) {
+						x, y = nx, ny
+						break
+					}
+
+					dir = (dir + 1) % dirlen
+				}
 			}
-		}
+
+			c.Inc("loops", sum)
+		}(k, dir)
 	}
 
+	wg.Wait()
+
 	fmt.Println("part1:", len(visited))
-	fmt.Println("part2:", loops)
+	fmt.Println("part2:", c.v["loops"])
 }
 
 func getNext(x int, y int, dir int) (int, int) {
@@ -97,14 +125,6 @@ func charAt(x int, y int) rune {
 	}
 
 	return rune(input[int(y)*int(w+1)+int(x)])
-}
-
-func key(x int, y int) string {
-	return fmt.Sprintf("%d:%d", x, y)
-}
-
-func dirKey(x int, y int, dir int) string {
-	return fmt.Sprintf("%d:%d:%d", x, y, dir)
 }
 
 func findStart() (int, int) {
