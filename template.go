@@ -1,20 +1,33 @@
 package main
 
 import (
-	"bufio"
-	"os"
+	_ "embed"
+	"fmt"
+	"time"
 )
 
+//go:embed input.txt
+var input string
+
 func main() {
-	input := parseInput()
+	part1, part2 := 0, 0
+	sum := 0
+	n := 1 // increase samples if benching perf
+
+	for range n {
+		start := time.Now()
+		part1, part2 = solution()
+		sum += int(time.Since(start).Milliseconds())
+	}
+
+	fmt.Println("part1:", part1)
+	fmt.Println("part2:", part2)
+	fmt.Println("avg:", sum/n, "ms")
 }
 
-func parseInput() {
-	file, _ := os.Open("$DAY/example.txt")
-	defer file.Close()
+func solution() (int, int) {
+	part1 := 0
+	part2 := 0
 
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-	}
+	return part1, part2
 }
