@@ -4,6 +4,7 @@ import (
 	"bufio"
 	_ "embed"
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -12,6 +13,12 @@ import (
 
 //go:embed input.txt
 var input string
+
+type Context struct {
+	target int
+	parts  []int
+	concat bool
+}
 
 func solution() (int, int) {
 	part1 := 0
@@ -33,10 +40,10 @@ func solution() (int, int) {
 		testval := nums[0]
 		parts := nums[1:]
 
-		if combines(parts, testval, false) {
+		if combines(parts[0], 1, Context{testval, parts, false}) {
 			part1 += testval
 			part2 += testval
-		} else if combines(parts, testval, true) {
+		} else if combines(parts[0], 1, Context{testval, parts, true}) {
 			part2 += testval
 		}
 	}
@@ -44,38 +51,43 @@ func solution() (int, int) {
 	return part1, part2
 }
 
-func combines(ns []int, target int, concatEnabled bool) bool {
-	if len(ns) == 0 || ns[0] > target {
+func combines(a, i int, ctx Context) bool {
+	if i == len(ctx.parts) {
+		return a == ctx.target
+	}
+
+	if a > ctx.target {
 		return false
 	}
 
-	if len(ns) == 1 {
-		return ns[0] == target
+	b, j := ctx.parts[i], i+1
+
+	return combines(a+b, j, ctx) || combines(a*b, j, ctx) || ctx.concat && combines(concat(a, b), j, ctx)
+}
+
+func concat(a int, b int) int {
+	return a*int(math.Pow10(digits(b))) + b
+}
+
+func digits(i int) int {
+	if i == 0 {
+		return 1
 	}
 
-	add := func() bool {
-		next := append([]int{ns[0] + ns[1]}, ns[2:]...)
-		return combines(next, target, concatEnabled)
+	count := 0
+
+	for i != 0 {
+		i /= 10
+		count++
 	}
 
-	multiply := func() bool {
-		next := append([]int{ns[0] * ns[1]}, ns[2:]...)
-		return combines(next, target, concatEnabled)
-	}
-
-	concat := func() bool {
-		c, _ := strconv.Atoi(fmt.Sprintf("%d%d", ns[0], ns[1]))
-		next := append([]int{c}, ns[2:]...)
-		return combines(next, target, concatEnabled)
-	}
-
-	return add() || multiply() || concatEnabled && concat()
+	return count
 }
 
 func main() {
 	part1, part2 := 0, 0
 	sum := 0
-	n := 100 // increase samples if benching perf
+	n := 10 // increase samples if benching perf
 
 	for range n {
 		start := time.Now()
