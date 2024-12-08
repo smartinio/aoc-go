@@ -44,7 +44,7 @@ func main() {
 					}
 
 					for _, anti := range antis {
-						if anti != a && anti != b && isOnMap(anti) && !p1nodes[anti] {
+						if anti != a && anti != b && isOnMap(anti) {
 							p1nodes[anti] = true
 						}
 					}
