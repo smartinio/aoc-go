@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"fmt"
 	"slices"
-	"strconv"
 	"time"
 )
 
@@ -21,24 +20,18 @@ func solution() (int, int) {
 	offset := 0
 
 	for i := range len(input) {
-		digit := input[i]
-		blocks, _ := strconv.Atoi(string(digit))
+		blocks := int(input[i]) - '0'
+		id := FREE
 
 		if i%2 == 0 {
-			id := i / 2
-
-			for range blocks {
-				disk = append(disk, id)
-			}
+			id = i / 2
+		} else if blocks > 0 {
+			spans = append(spans, Span{offset, blocks})
 		} else {
-			for range blocks {
-				disk = append(disk, FREE)
-			}
-			if blocks > 0 {
-				spans = append(spans, Span{offset, blocks})
-			}
+			continue
 		}
 
+		disk = append(disk, slices.Repeat([]int{id}, blocks)...)
 		offset += blocks
 	}
 
