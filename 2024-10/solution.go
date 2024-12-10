@@ -48,7 +48,8 @@ func score(pos Pos, path []Pos, reached map[Pos]bool, expected int, unique bool)
 	sum := 0
 
 	for _, d := range DIRS {
-		sum += score(Pos{pos.x + d.x, pos.y + d.y}, path, reached, expected+1, unique)
+		next := Pos{pos.x + d.x, pos.y + d.y}
+		sum += score(next, path, reached, expected+1, unique)
 	}
 
 	return sum
