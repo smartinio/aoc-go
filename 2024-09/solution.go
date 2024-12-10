@@ -43,9 +43,8 @@ func solution() (int, int) {
 	}
 
 	// part 1
-	p1disk := make([]int, len(disk))
+	p1disk := append([]int{}, disk...)
 	maxLen := len(p1disk) - 1
-	copy(p1disk, disk)
 	{
 		left := slices.Index(disk, FREE)
 
@@ -67,9 +66,8 @@ func solution() (int, int) {
 	part1 := checksum(p1disk)
 
 	// part 2
+	p2disk := append([]int{}, disk...)
 	maxSize := int(^uint(0) >> 1)
-	p2disk := make([]int, len(disk))
-	copy(p2disk, disk)
 	{
 		right := len(disk) - 1
 		left := right - 1
@@ -140,7 +138,7 @@ func checksum(disk []int) int {
 func main() {
 	part1, part2 := 0, 0
 	sum := 0
-	n := 1 // increase samples if benching perf
+	n := 20 // increase samples if benching perf
 
 	for range n {
 		start := time.Now()
