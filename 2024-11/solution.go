@@ -19,19 +19,18 @@ type Job struct {
 func solution() (int, int) {
 	part1, part2 := 0, 0
 	nums := strings.Split(strings.TrimSpace(input), " ")
+	cache := make(map[Job]int)
 
 	for _, num := range nums {
 		stone, _ := strconv.Atoi(num)
-		part1 += 1 + spawns(Job{stone, 25 + 1})
-		part2 += 1 + spawns(Job{stone, 75 + 1})
+		part1 += 1 + spawns(Job{stone, 25 + 1}, cache)
+		part2 += 1 + spawns(Job{stone, 75 + 1}, cache)
 	}
 
 	return part1, part2
 }
 
-var cache = make(map[Job]int)
-
-func spawns(job Job) int {
+func spawns(job Job, cache map[Job]int) int {
 	if cj, ok := cache[job]; ok {
 		return cj
 	}
@@ -48,7 +47,7 @@ func spawns(job Job) int {
 			runs := n - i - 1
 			if runs > 0 {
 				next := Job{b, runs}
-				total += 1 + spawns(next)
+				total += 1 + spawns(next, cache)
 			}
 		} else {
 			stone *= 2024
@@ -86,7 +85,7 @@ func digits(i int) int {
 func main() {
 	part1, part2 := 0, 0
 	sum := 0
-	n := 20 // increase samples if benching perf
+	n := 100 // increase samples if benching perf
 
 	for range n {
 		start := time.Now()
