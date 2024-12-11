@@ -12,55 +12,56 @@ import (
 //go:embed input.txt
 var input string
 
-type Job struct {
-	stone, runs int
+type Stone struct {
+	number, blinks int
 }
 
 func solution() (int, int) {
 	part1, part2 := 0, 0
-	nums := strings.Split(strings.TrimSpace(input), " ")
-	cache := make(map[Job]int)
+	chars := strings.Split(strings.TrimSpace(input), " ")
+	cache := make(map[Stone]int)
 
-	for _, num := range nums {
-		stone, _ := strconv.Atoi(num)
-		part1 += 1 + spawns(Job{stone, 25}, cache)
-		part2 += 1 + spawns(Job{stone, 75}, cache)
+	for _, str := range chars {
+		number, _ := strconv.Atoi(str)
+		part1 += 1 + splits(Stone{number, 25}, cache)
+		part2 += 1 + splits(Stone{number, 75}, cache)
 	}
 
 	return part1, part2
 }
 
-func spawns(job Job, cache map[Job]int) int {
-	if cj, ok := cache[job]; ok {
-		return cj
+func splits(stone Stone, cache map[Stone]int) int {
+	if cached, ok := cache[stone]; ok {
+		return cached
 	}
 
-	stone, n := job.stone, job.runs
+	num, blinks := stone.number, stone.blinks
 	total := 0
 
-	for i := range n {
-		if stone == 0 {
-			stone = 1
-		} else if digits(stone)%2 == 0 {
-			a, b := split(stone)
-			stone = a
-			total += 1 + spawns(Job{b, n - i - 1}, cache)
+	for i := range blinks {
+		if num == 0 {
+			num = 1
+		} else if digits(num)%2 == 0 {
+			left, right := split(num)
+			num = left
+			total += 1 + splits(Stone{right, blinks - i - 1}, cache)
 		} else {
-			stone *= 2024
+			num *= 2024
 		}
 	}
 
-	cache[job] = total
+	cache[stone] = total
 
 	return total
 }
 
 func split(i int) (int, int) {
 	half := digits(i) / 2
-	b10 := int(math.Pow10(half))
-	p1 := i / b10
+	tens := int(math.Pow10(half))
+	left := i / tens
+	right := i - left*tens
 
-	return p1, i - p1*b10
+	return left, right
 }
 
 func digits(i int) int {
