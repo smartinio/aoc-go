@@ -23,8 +23,8 @@ func solution() (int, int) {
 
 	for _, num := range nums {
 		stone, _ := strconv.Atoi(num)
-		part1 += 1 + spawns(Job{stone, 25 + 1}, cache)
-		part2 += 1 + spawns(Job{stone, 75 + 1}, cache)
+		part1 += 1 + spawns(Job{stone, 25}, cache)
+		part2 += 1 + spawns(Job{stone, 75}, cache)
 	}
 
 	return part1, part2
@@ -44,11 +44,7 @@ func spawns(job Job, cache map[Job]int) int {
 		} else if digits(stone)%2 == 0 {
 			a, b := split(stone)
 			stone = a
-			runs := n - i - 1
-			if runs > 0 {
-				next := Job{b, runs}
-				total += 1 + spawns(next, cache)
-			}
+			total += 1 + spawns(Job{b, n - i - 1}, cache)
 		} else {
 			stone *= 2024
 		}
