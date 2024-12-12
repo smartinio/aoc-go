@@ -1,0 +1,10 @@
+....--,,FF
+....--,,,F
+VV...,,FFF
+VV.,,,JFFF
+VVVV,JJ,FE
+VV-V,,JJEE
+VV---,JJEE
++-----JJEE
++---S-JEEE
++++-SSJEEE
