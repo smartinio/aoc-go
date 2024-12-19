@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"main/perf"
 	"os"
 	"regexp"
 	"strconv"
 )
 
-func main() {
+func solution() (int, int) {
 	file, _ := os.ReadFile("2024-03/input.txt")
 
 	re := regexp.MustCompile(`do\(\)|don't\(\)|mul\((\d+),(\d+)\)`)
@@ -32,6 +32,9 @@ func main() {
 		}
 	}
 
-	fmt.Println("part 1:", part1)
-	fmt.Println("part 2:", part2)
+	return part1, part2
+}
+
+func main() {
+	perf.Bench(100, solution)
 }
