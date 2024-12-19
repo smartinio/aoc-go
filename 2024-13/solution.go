@@ -2,7 +2,7 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
+	"main/perf"
 	"regexp"
 	"strconv"
 	"strings"
@@ -78,7 +78,5 @@ func det(m Machine) int {
 }
 
 func main() {
-	part1, part2 := solution()
-	fmt.Println("part1:", part1)
-	fmt.Println("part2:", part2)
+	perf.Bench(100, solution)
 }
