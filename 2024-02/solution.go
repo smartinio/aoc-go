@@ -2,58 +2,48 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	"main/perf"
 	"os"
 	"strconv"
 	"strings"
 )
 
-func main() {
-	part1()
-	part2()
-}
-
-func part1() {
+func solution() (int, int) {
+	part1, part2 := 0, 0
 	reports := parseInput()
-	safeCount := 0
 
 	for _, report := range reports {
 		if isSafe(report) {
-			safeCount += 1
+			part1 += 1
 		}
 	}
 
-	fmt.Println("part 1:", safeCount)
-}
-
-func part2() {
-	reports := parseInput()
-	safeCount := 0
-
-outer:
-	for _, report := range reports {
+	brute := func(report []int) {
 		if isSafe(report) {
-			safeCount += 1
-			continue
+			part2 += 1
+			return
 		}
 
 		for i := range report {
 			dampenedReport := dampen(report, i)
 
 			if isSafe(dampenedReport) {
-				safeCount += 1
-				continue outer
+				part2 += 1
+				return
 			}
 		}
 	}
 
-	fmt.Println("part 2:", safeCount)
+	for _, report := range reports {
+		brute(report)
+	}
+
+	return part1, part2
 }
 
 func isSafe(report []int) bool {
+	increasing, decreasing := false, false
 	prev := -1
-	increasing := false
-	decreasing := false
 
 	for _, level := range report {
 		if prev != -1 {
@@ -101,7 +91,6 @@ func parseInput() [][]int {
 		ids := strings.Split(line, " ")
 
 		report := []int{}
-
 		for _, id := range ids {
 			level, _ := strconv.Atoi(id)
 			report = append(report, level)
@@ -111,4 +100,8 @@ func parseInput() [][]int {
 	}
 
 	return reports
+}
+
+func main() {
+	perf.Bench(100, solution)
 }
