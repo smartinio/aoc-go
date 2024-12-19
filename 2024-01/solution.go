@@ -2,55 +2,36 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	"main/perf"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
 )
 
-func main() {
-	part1()
-	part2()
-}
-
-func part1() {
+func solution() (int, int) {
+	part1, part2 := 0, 0
 	left, right := parseInput()
+	count := map[int]int{}
 
 	sort.Ints(left)
 	sort.Ints(right)
 
-	sum := 0
-
-	for i := 0; i < len(left); i++ {
+	for i := range left {
 		l, r := left[i], right[i]
-		sum += max(l, r) - min(l, r)
-	}
-
-	fmt.Println("total distance:", sum)
-}
-
-func part2() {
-	left, right := parseInput()
-	count := make(map[int]int)
-
-	for i := 0; i < len(right); i++ {
+		part1 += max(l, r) - min(l, r)
 		count[right[i]] += 1
 	}
 
-	score := 0
-
-	for i := 0; i < len(left); i++ {
-		l := left[i]
-		score += l * count[l]
+	for _, l := range left {
+		part2 += l * count[l]
 	}
 
-	fmt.Println("similarity score:", score)
+	return part1, part2
 }
 
 func parseInput() ([]int, []int) {
 	file, _ := os.Open("2024-01/input.txt")
-
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -66,4 +47,8 @@ func parseInput() ([]int, []int) {
 	}
 
 	return left, right
+}
+
+func main() {
+	perf.Bench(1, solution)
 }
