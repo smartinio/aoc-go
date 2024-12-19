@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	_ "embed"
-	"fmt"
+	"main/perf"
 	"regexp"
 	"strconv"
 	"strings"
@@ -80,7 +80,5 @@ func wrap(i, max int) int {
 }
 
 func main() {
-	part1, part2 := solution()
-	fmt.Println("part1:", part1)
-	fmt.Println("part2:", part2)
+	perf.Bench(10, solution)
 }
