@@ -2,7 +2,7 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
+	"main/perf"
 	"strings"
 )
 
@@ -11,7 +11,7 @@ var input string
 var w int = strings.Index(input, "\n")
 var h int = strings.Count(input, "\n")
 
-func main() {
+func solution() (int, int) {
 	part1, part2 := 0, 0
 
 	for x := range w {
@@ -28,8 +28,7 @@ func main() {
 		}
 	}
 
-	fmt.Println("part1:", part1)
-	fmt.Println("part2:", part2)
+	return part1, part2
 }
 
 func charAt(x int, y int) rune {
@@ -81,4 +80,8 @@ func dirSpells(x int, y int, dx int, dy int, word string) bool {
 	}
 
 	return true
+}
+
+func main() {
+	perf.Bench(100, solution)
 }
