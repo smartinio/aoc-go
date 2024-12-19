@@ -3,11 +3,11 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"main/perf"
 	"math"
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
 //go:embed input.txt
@@ -144,17 +144,5 @@ func execute(code int, opd int, prg *Program) {
 }
 
 func main() {
-	part1, part2 := "", 0
-	sum := 0
-	n := 500 // increase samples if benching perf
-
-	for range n {
-		start := time.Now()
-		part1, part2 = solution()
-		sum += int(time.Since(start).Microseconds())
-	}
-
-	fmt.Println("part1:", part1)
-	fmt.Println("part2:", part2)
-	fmt.Println("avg:", sum/n, "μs")
+	perf.Bench(500, solution)
 }
