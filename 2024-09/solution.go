@@ -2,9 +2,8 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
+	"main/perf"
 	"slices"
-	"time"
 )
 
 //go:embed input.txt
@@ -129,17 +128,5 @@ func checksum(disk []int) int {
 }
 
 func main() {
-	part1, part2 := 0, 0
-	sum := 0
-	n := 20 // increase samples if benching perf
-
-	for range n {
-		start := time.Now()
-		part1, part2 = solution()
-		sum += int(time.Since(start).Milliseconds())
-	}
-
-	fmt.Println("part1:", part1)
-	fmt.Println("part2:", part2)
-	fmt.Println("avg:", sum/n, "ms")
+	perf.Bench(20, solution)
 }
