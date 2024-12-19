@@ -2,11 +2,10 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
+	"main/perf"
 	"slices"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type Pos struct{ x, y int }
@@ -92,17 +91,5 @@ func parseInput() (map[Pos]int, []Pos) {
 }
 
 func main() {
-	part1, part2 := 0, Pos{}
-	sum := 0
-	n := 25 // increase samples if benching perf
-
-	for range n {
-		start := time.Now()
-		part1, part2 = solution()
-		sum += int(time.Since(start).Milliseconds())
-	}
-
-	fmt.Println("part1:", part1)
-	fmt.Println("part2:", part2)
-	fmt.Println("avg:", sum/n, "ms")
+	perf.Bench(25, solution)
 }
