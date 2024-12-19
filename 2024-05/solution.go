@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"main/perf"
 	"os"
 	"slices"
 	"strconv"
 	"strings"
 )
 
-func main() {
+func solution() (int, int) {
 	rules, updates := parseInput()
 	part1, part2 := 0, 0
 
@@ -37,8 +38,7 @@ func main() {
 		part2 += val
 	}
 
-	fmt.Println("part 1:", part1)
-	fmt.Println("part 2:", part2)
+	return part1, part2
 }
 
 func parseInput() (map[string]bool, [][]string) {
@@ -62,4 +62,8 @@ func parseInput() (map[string]bool, [][]string) {
 	}
 
 	return rules, updates
+}
+
+func main() {
+	perf.Bench(100, solution)
 }
