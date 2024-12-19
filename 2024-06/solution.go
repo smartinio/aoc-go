@@ -2,10 +2,9 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
+	"main/perf"
 	"strings"
 	"sync"
-	"time"
 )
 
 type Dir struct{ x, y int }
@@ -18,7 +17,6 @@ type SafeCounter struct {
 
 func (c *SafeCounter) Inc(key string, value int) {
 	c.mu.Lock()
-	// Lock so only one goroutine at a time can access the map c.v.
 	c.v[key] += value
 	c.mu.Unlock()
 }
@@ -29,22 +27,6 @@ var w int = strings.Index(input, "\n")
 var h int = strings.Count(input, "\n")
 var dirs []Dir = []Dir{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 var dirlen int = len(dirs)
-
-func main() {
-	part1, part2 := 0, 0
-	sum := 0
-	n := 1 // increase samples if benching perf
-
-	for range n {
-		start := time.Now()
-		part1, part2 = solution()
-		sum += int(time.Since(start).Milliseconds())
-	}
-
-	fmt.Println("part1:", part1)
-	fmt.Println("part2:", part2)
-	fmt.Println("avg:", sum/n, "ms")
-}
 
 func solution() (int, int) {
 	visited := make(map[Pos]int)
@@ -154,4 +136,8 @@ func findStart() Pos {
 		}
 	}
 	return Pos{}
+}
+
+func main() {
+	perf.Bench(10, solution)
 }
