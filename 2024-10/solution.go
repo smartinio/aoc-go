@@ -2,10 +2,9 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
+	"main/perf"
 	"slices"
 	"strings"
-	"time"
 )
 
 type Dir struct{ x, y int }
@@ -66,17 +65,5 @@ func numberAt(pos Pos) int {
 }
 
 func main() {
-	part1, part2 := 0, 0
-	sum := 0
-	n := 20
-
-	for range n {
-		start := time.Now()
-		part1, part2 = solution()
-		sum += int(time.Since(start).Milliseconds())
-	}
-
-	fmt.Println("part1:", part1)
-	fmt.Println("part2:", part2)
-	fmt.Println("avg:", sum/n, "ms")
+	perf.Bench(20, solution)
 }
