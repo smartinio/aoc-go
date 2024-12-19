@@ -2,11 +2,10 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
-	"time"
+	"main/perf"
 )
 
-//go:embed input.txt
+//go:embed example.txt
 var input string
 
 func solution() (int, int) {
@@ -17,17 +16,5 @@ func solution() (int, int) {
 }
 
 func main() {
-	part1, part2 := 0, 0
-	sum := 0
-	n := 1 // increase samples if benching perf
-
-	for range n {
-		start := time.Now()
-		part1, part2 = solution()
-		sum += int(time.Since(start).Milliseconds())
-	}
-
-	fmt.Println("part1:", part1)
-	fmt.Println("part2:", part2)
-	fmt.Println("avg:", sum/n, "ms")
+	perf.Bench(1, solution)
 }
