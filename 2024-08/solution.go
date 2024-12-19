@@ -2,7 +2,7 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
+	"main/perf"
 	"strings"
 )
 
@@ -13,7 +13,7 @@ var W = strings.Index(input, "\n")
 
 type Loc struct{ x, y int }
 
-func main() {
+func solution() (int, int) {
 	towers := make(map[rune][]Loc)
 	p1nodes := make(map[Loc]bool)
 	p2nodes := make(map[Loc]bool)
@@ -65,8 +65,7 @@ func main() {
 		}
 	}
 
-	fmt.Println("part1:", len(p1nodes))
-	fmt.Println("part2:", len(p2nodes))
+	return len(p1nodes), len(p2nodes)
 }
 
 func isOnMap(loc Loc) bool {
@@ -83,4 +82,8 @@ func charAt(pos Loc) rune {
 	}
 
 	return rune(input[y*(W+1)+x])
+}
+
+func main() {
+	perf.Bench(100, solution)
 }
