@@ -52,11 +52,9 @@ func dfs(pos Pos, path []Vertex, count int) []Vertex {
 		next := Pos{pos.x + d.x, pos.y + d.y}
 		visited := count > 0 && next == path[count-1].pos
 
-		if charAt(next) == '#' || visited {
-			continue
+		if !visited && charAt(next) != '#' {
+			return dfs(next, graph, count+1)
 		}
-
-		return dfs(next, graph, count+1)
 	}
 
 	return graph
@@ -92,5 +90,5 @@ func charAt(pos Pos) rune {
 }
 
 func main() {
-	perf.Bench(20, solution)
+	perf.Bench(1, solution)
 }

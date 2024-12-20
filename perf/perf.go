@@ -42,9 +42,9 @@ func Bench[P1 any, P2 any](n int, callback func() (P1, P2)) Result[P1, P2] {
 	fmt.Println("part1:", result.Part1)
 	fmt.Println("part2:", result.Part2)
 	fmt.Println("---")
-	fmt.Println("p99:", result.P99)
 	fmt.Println("p50:", result.P50)
 	fmt.Println("avg:", result.Avg)
+	fmt.Println("p99:", result.P99)
 	fmt.Println("---")
 
 	return result
