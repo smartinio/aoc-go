@@ -25,36 +25,25 @@ func solution() (int, string) {
 	// part 1
 	{
 		type Key struct{ a, b, c string }
-		res := [][]string{}
-		seen := map[Key]bool{}
+		set := map[Key]bool{}
 
 		for k, v := range conns {
 			for i := range v {
 				for j := range v[1:] {
 					a, b := v[i], v[j]
+					startsWithT := k == "t" || a[0] == 't' || b[0] == 't'
 
-					if k != "t" && a[0] != 't' && b[0] != 't' {
-						continue
-					}
-
-					n := []string{k, a, b}
-					slices.Sort(n)
-					key := Key{n[0], n[1], n[2]}
-
-					if seen[key] {
-						continue
-					}
-
-					seen[key] = true
-
-					if slices.Contains(conns[a], b) {
-						res = append(res, []string{k, a, b})
+					if startsWithT && slices.Contains(conns[a], b) {
+						n := []string{k, a, b}
+						slices.Sort(n)
+						key := Key{n[0], n[1], n[2]}
+						set[key] = true
 					}
 				}
 			}
 		}
 
-		part1 = len(res)
+		part1 = len(set)
 	}
 
 	// part 2
@@ -73,7 +62,6 @@ func solution() (int, string) {
 			}
 
 			score := 1
-
 			for _, v := range mutuals {
 				score *= v
 			}
