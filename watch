@@ -1,6 +1,8 @@
 #!/bin/bash
+curr_year=$(date -j +%Y)
+year=${1-$curr_year}
 
-latest=$(ls -d 2024-* | sort -t '-' -k2,2n | tail -n 1)
+latest=$(ls -d $year/* | sort -t '-' -k2,2n | tail -n 1)
 watch_dir=${1-$latest}
 last_modified=0
 
