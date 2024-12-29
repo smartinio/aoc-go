@@ -11,6 +11,8 @@ while true; do
 
     if [ "$new_modified" -ne "$last_modified" ]; then
         clear
+        echo "$watch_dir:"
+        echo "---"
         last_modified=$new_modified
         go run "$watch_dir/solution.go"
     fi

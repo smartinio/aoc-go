@@ -30,3 +30,7 @@ touch "./$day/example.txt"
 touch "./$day/input.txt"
 
 cat ./template.go > "./$day/solution.go"
+
+if [[ " $@ " =~ " --watch "  || " $@ " =~ " -w " ]]; then
+  ./watch "$day"
+fi
