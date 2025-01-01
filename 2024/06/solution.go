@@ -23,10 +23,10 @@ func (c *SafeCounter) Inc(key string, value int) {
 
 //go:embed input.txt
 var input string
-var w int = strings.Index(input, "\n")
-var h int = strings.Count(input, "\n")
+var W = strings.Index(input, "\n")
+var H = strings.Count(input, "\n")
 var dirs []Dir = []Dir{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
-var dirlen int = len(dirs)
+var dirlen = len(dirs)
 
 func solution() (int, int) {
 	visited := make(map[Pos]int)
@@ -120,16 +120,16 @@ func getNext(pos Pos, dir int) Pos {
 func charAt(pos Pos) rune {
 	x, y := pos.x, pos.y
 
-	if x >= w || y >= h || x < 0 || y < 0 {
+	if x >= W || y >= H || x < 0 || y < 0 {
 		return 0
 	}
 
-	return rune(input[int(y)*int(w+1)+int(x)])
+	return rune(input[y*(W+1)+x])
 }
 
 func findStart() Pos {
-	for x := range w {
-		for y := range h {
+	for x := range W {
+		for y := range H {
 			if charAt(Pos{x, y}) == '^' {
 				return Pos{x, y}
 			}
