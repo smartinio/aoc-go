@@ -29,3 +29,26 @@ func CartesianProduct[T any](matrix [][]T) [][]T {
 
 	return results
 }
+
+func Choose[E any](n []E, k int) <-chan []E {
+	ch := make(chan []E, 50) // smallish buffer for better perf
+
+	go func() {
+		defer close(ch)
+		var backtrack func(start int, chosen []E)
+
+		backtrack = func(start int, chosen []E) {
+			if len(chosen) == k {
+				ch <- chosen
+				return
+			}
+			for i := start; i < len(n); i++ {
+				backtrack(i+1, append(chosen, n[i]))
+			}
+		}
+
+		backtrack(0, []E{})
+	}()
+
+	return ch
+}
