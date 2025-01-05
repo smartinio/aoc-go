@@ -3,8 +3,8 @@
 Using aoc to learn golang
 
 ```shell
-# Scaffold next day
-./scaffold
+# Create new year/day folder
+./new [year] [--watch]
 
 # Run solution
 go run 2024/01/solution.go
