@@ -2,12 +2,15 @@
 curr_year=$(date -j +%Y)
 year=${1-$curr_year}
 
-latest=$(ls -d $year/* | sort -t '-' -k2,2n | tail -n 1)
-watch_dir=${1-$latest}
+latest=$(cd $year && ls -d * | sort -t '-' -k2,2n | tail -n 1)
+day=${2-$latest}
+watch_dir="$year/$day"
 last_modified=0
 
 while true; do
-    new_modified=$(find "$watch_dir" -type f -exec stat -f "%m" {} + | sort -nr | head -n1)
+    a=$(find "$watch_dir" -type f -exec stat -f "%m" {} + | sort -nr | head -n1)
+    b=$(find "utils" -type f -exec stat -f "%m" {} + | sort -nr | head -n1)
+    new_modified=$(($a + $b))
 
     if [ "$new_modified" -ne "$last_modified" ]; then
         clear

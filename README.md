@@ -3,15 +3,12 @@
 Using aoc to learn golang
 
 ```shell
-# Create new year/day folder
-./new [year] [--watch]
+# Create new solution folder
+./new [year] [day] # defaults: [current year] [latest existing day + 1]
 
-# Run solution
+# Watch solution
+./watch [year] [day] # defaults: [current year] [latest existing day]
+
+# Run specific solution
 go run 2024/01/solution.go
-
-# Watch solution (latest day)
-./watch
-
-# Watch solution (specific day)
-./watch 2024/01
 ```
