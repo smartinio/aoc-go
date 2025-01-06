@@ -3,12 +3,12 @@ package main
 import (
 	_ "embed"
 	"main/perf"
+	"main/utils"
 	"strconv"
 	"strings"
 )
 
-type Seq struct{ s0, s1, s2, s3 int }
-type Sale struct{ buyer, s0, s1, s2, s3 int }
+type Seq [4]int
 
 //go:embed input.txt
 var input string
@@ -19,78 +19,74 @@ func solution() (int, int) {
 	lines := strings.Split(strings.TrimSpace(input), "\n")
 
 	// part 1
-	for _, line := range lines {
-		secret, _ := strconv.Atoi(line)
-		for range 2000 {
-			secret = evolve(secret)
+	{
+		secrets := utils.ConcurrentFunc(lines, func(line string) int {
+			secret, _ := strconv.Atoi(line)
+			for range 2000 {
+				secret = evolve(secret)
+			}
+			return secret
+		})
+
+		for _, secret := range secrets {
+			part1 += secret
 		}
-		part1 += secret
 	}
 
 	// part 2
-	deltas := map[int][]int{}
-	prices := map[int][]int{}
+	{
+		results := utils.ConcurrentFunc(lines, func(line string) map[Seq]int {
+			secret, _ := strconv.Atoi(line)
+			deltas, price := process(secret)
+			prices := make(map[Seq]int, len(deltas)-3)
 
-	for _, line := range lines {
-		secret, _ := strconv.Atoi(line)
-		deltas[secret], prices[secret] = process(secret)
-	}
+			for j := range len(deltas) - 3 {
+				seq := Seq(deltas[j : j+4])
+				if _, ok := prices[seq]; !ok {
+					prices[seq] = price[j+3]
+				}
+			}
 
-	seqPrices := map[Seq]int{}
-	sold := map[Sale]bool{}
+			return prices
+		})
 
-	for buyer, d := range deltas {
-		for j := range d[:len(d)-3] {
-			s := Seq{d[j], d[j+1], d[j+2], d[j+3]}
-			sale := Sale{buyer, s.s0, s.s1, s.s2, s.s3}
+		total := make(map[Seq]int, 400000)
 
-			if !sold[sale] {
-				seqPrices[s] += prices[buyer][j+3]
-				sold[sale] = true
+		for _, prices := range results {
+			for seq, price := range prices {
+				total[seq] += price
 			}
 		}
-	}
 
-	for _, price := range seqPrices {
-		part2 = max(part2, price)
+		for _, price := range total {
+			part2 = max(part2, price)
+		}
 	}
 
 	return part1, part2
 }
 
 func process(secret int) ([]int, []int) {
-	deltas, prices := []int{}, []int{}
-	prev := lastDigit(secret)
+	deltas, prices := make([]int, 2000), make([]int, 2000)
+	prev := secret % 10
 
-	for range 2000 {
+	for i := range 2000 {
 		secret = evolve(secret)
-		price := lastDigit(secret)
-		prices = append(prices, price)
-		deltas = append(deltas, price-prev)
+		price := secret % 10
+		prices[i] = price
+		deltas[i] = price - prev
 		prev = price
 	}
 
 	return deltas, prices
 }
 
-func lastDigit(secret int) int {
-	return secret % 10
-}
-
 func evolve(secret int) int {
-	secret = mix(secret, secret*64)
-	secret = prune(secret)
-	secret = mix(secret, secret/32)
-	secret = prune(secret)
-	secret = mix(secret, secret*2048)
-	return prune(secret)
-}
-
-func mix(secret int, value int) int {
-	return secret ^ value
-}
-
-func prune(secret int) int {
+	secret ^= secret * 64
+	secret %= 16777216
+	secret ^= secret / 32
+	secret %= 16777216
+	secret ^= secret * 2048
 	return secret % 16777216
 }
 
