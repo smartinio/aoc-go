@@ -18,44 +18,30 @@ var h = strings.Count(input, "\n") - 1
 func solution() (int, int) {
 	part1, part2 := 0, 0
 	sy, sx := 0, strings.Index(input, "S")
-	part1 = splits(sx, sy, make(Seen))
-	part2 = spawn(Key{sx, sy}, make(Cache))
+	cache := make(Cache)
+	part2 = beam(sx, sy, cache)
+	part1 = len(cache) // only caching on split
 
 	return part1, part2
 }
 
-func splits(x int, sy int, seen Seen) int {
-	for y := sy; y < h; y++ {
-		k := Key{x, y}
-
-		if seen[k] {
-			break
-		}
-
-		if charAt(x, y) == '^' {
-			seen[k] = true
-			return 1 + splits(x+1, y, seen) + splits(x-1, y, seen)
-		}
+func beam(x int, y int, cache Cache) int {
+	if y >= h {
+		return 1
 	}
 
-	return 0
-}
+	k := Key{x, y}
 
-func spawn(k Key, cache Cache) int {
 	if cache[k] != 0 {
 		return cache[k]
 	}
 
-	for y := k.y; y < h; y++ {
-		if charAt(k.x, y) == '^' {
-			a, b := Key{k.x + 1, y}, Key{k.x - 1, y}
-			cache[a] = spawn(a, cache)
-			cache[b] = spawn(b, cache)
-			return cache[a] + cache[b]
-		}
+	if charAt(x, y) == '^' {
+		cache[k] = beam(x+1, y, cache) + beam(x-1, y, cache)
+		return cache[k]
 	}
 
-	return 1
+	return beam(x, y+1, cache)
 }
 
 func charAt(x int, y int) byte {
